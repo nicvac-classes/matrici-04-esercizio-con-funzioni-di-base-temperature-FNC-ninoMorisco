@@ -1,53 +1,85 @@
-public class UtilsMatrice {
-    
-    // Per matrici int
-    public static void visualizza(int[][] matrice) {
-        if (matrice == null || matrice.length == 0) {
-            System.out.println("Matrice vuota");
-            return;
-        }
-        for (int i = 0; i < matrice.length; i++) {
-            for (int j = 0; j < matrice[i].length; j++) {
-                System.out.printf("%4d ", matrice[i][j]);
+import java.util.Scanner;
+import java.util.Random;
+
+class Esercizio {
+
+    public static Scanner in = new Scanner(System.in);
+    public static Random random = new Random();
+
+    // Record per il massimo
+    public static record Max(int massimo, int rIdx, int cIdx) {}
+
+    // Trova il massimo nella matrice
+    public static Max calcolaMassimo(int[][] M, int nR, int nC) {
+
+        int maxVal = M[0][0];
+        int posR = 0;
+        int posC = 0;
+
+        for (int r = 0; r < nR; r++) {
+            for (int c = 0; c < nC; c++) {
+                int corrente = M[r][c];
+                if (corrente > maxVal) {
+                    maxVal = corrente;
+                    posR = r;
+                    posC = c;
+                }
             }
-            System.out.println();
         }
+        return new Max(maxVal, posR, posC);
     }
-    
-    // Per matrici double
-    public static void visualizza(double[][] matrice) {
-        if (matrice == null || matrice.length == 0) {
-            System.out.println("Matrice vuota");
-            return;
+
+    // Media di una colonna
+    public static float calcolaMedia(int[][] M, int nR, int colonna) {
+        float accumulo = 0f;
+
+        for (int r = 0; r < nR; r++) {
+            accumulo += M[r][colonna];
         }
-        for (int i = 0; i < matrice.length; i++) {
-            for (int j = 0; j < matrice[i].length; j++) {
-                System.out.printf("%7.2f ", matrice[i][j]);
-            }
-            System.out.println();
-        }
+
+        return accumulo / nR;
     }
-    
-    // Per matrici di oggetti (Integer, Double, String, ecc.)
-    public static <T> void visualizza(T[][] matrice) {
-        if (matrice == null || matrice.length == 0) {
-            System.out.println("Matrice vuota");
-            return;
-        }
-        for (int i = 0; i < matrice.length; i++) {
-            for (int j = 0; j < matrice[i].length; j++) {
-                System.out.printf("%10s ", matrice[i][j]);
+
+    // Riempi la matrice di valori casuali
+    public static void riempiCasuale(int[][] M, int RIGHE, int COLONNE, int valMin, int valMax) {
+        Random generatore = new Random();
+
+        for (int r = 0; r < RIGHE; r++) {
+            for (int c = 0; c < COLONNE; c++) {
+                int range = (valMax - valMin) + 1;
+                M[r][c] = generatore.nextInt(range) + valMin;
             }
-            System.out.println();
         }
     }
 
-    /* Es. come Ritornare più variabili in output
-    public static record Max(int max, int rIdx, int cIdx) { }
-    public static Max cercaMax(int[][] matrice) {
-        // ... ecc... 
-        return new Max(5, 2, 3);
-    }
-    */
+    public static void main(String[] args) {
 
+        int n = 7;
+        int m = 5;
+
+        int[][] M = new int[n][m];
+        riempiCasuale(M, n, m, 298, 314);
+
+        System.out.println("Temperature registrate:\n");
+        UtilsMatrice.visualizza(M);
+
+        Max risultato = calcolaMassimo(M, n, m);
+
+        System.out.println("\nTemperatura massima: " + risultato.massimo());
+        System.out.println("Verificatasi il giorno: " + (risultato.rIdx() + 1));
+        System.out.println("Alle ore: " + (risultato.cIdx() + 11));
+
+        float[] medieColonne = new float[m];
+
+        for (int col = 0; col < m; col++) {
+            medieColonne[col] = calcolaMedia(M, n, col);
+        }
+
+        System.out.println();
+        for (int ora = 0; ora < m; ora++) {
+            int inizio = ora + 11;
+            int fine = ora + 12;
+            System.out.println("Media fascia oraria: " + inizio + "-" + fine + ": " + medieColonne[ora]);
+        }
+    }
 }
